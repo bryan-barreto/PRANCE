@@ -6,10 +6,10 @@
 //!
 //! See the `Cargo.toml` file for Copyright and license details.
 
-#![no_std]
+#![no_std] //No strings,
 #![no_main]
-extern crate panic_halt;
 extern crate embedded_hal;
+extern crate panic_halt;
 extern crate rp2040_hal;
 
 // Ensure we halt the program on panic (if we don't mention this crate it won't
@@ -24,7 +24,7 @@ use rp2040_hal as hal;
 use hal::pac;
 
 // Some traits we need
-use embedded_hal::digital::v2::OutputPin;
+use embedded_hal::digital::v2::{InputPin, OutputPin};
 use rp2040_hal::clocks::Clock;
 
 /// The linker will place this boot block at the start of our program image. We
@@ -82,12 +82,18 @@ fn main() -> ! {
     );
 
     // Configure GPIO25 as an output
-    let mut led_pin = pins.gpio25.into_push_pull_output();
+    let mut led_pin = pins.gpio7.into_push_pull_output();
+    let button_pin = pins.gpio10.into_pull_down_input();
     loop {
-        led_pin.set_high().unwrap();
-        delay.delay_ms(500);
-        led_pin.set_low().unwrap();
-        delay.delay_ms(500);
+        if button_pin.is_low().unwrap() {
+            led_pin.set_low().unwrap();
+        } else {
+            led_pin.set_high().unwrap();
+        }
+        //
+        // delay.delay_ms(100);
+        //
+        // delay.delay_ms(100);
     }
 }
 
