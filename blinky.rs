@@ -84,11 +84,18 @@ fn main() -> ! {
     // Configure GPIO25 as an output
     let mut led_pin = pins.gpio7.into_push_pull_output();
     let button_pin = pins.gpio10.into_pull_down_input();
+    let mut hold_timer = 0;
     loop {
-        if button_pin.is_low().unwrap() {
-            led_pin.set_low().unwrap();
-        } else {
+        delay.delay_ms(10);
+        if button_pin.is_high().unwrap() {
             led_pin.set_high().unwrap();
+            hold_timer = 100;
+        } else {
+            led_pin.set_low().unwrap();
+            if hold_timer > 0 {
+                led_pin.set_high().unwrap();
+                hold_timer -= 1;
+            }
         }
         //
         // delay.delay_ms(100);
